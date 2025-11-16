@@ -1,0 +1,1 @@
+This is the README file for the LHNT EMG hardware-software interfacing team. Currently, we are tying to use Bluetooth to trasnmit EMG signals as a plot. 
