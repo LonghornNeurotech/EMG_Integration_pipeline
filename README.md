@@ -1,4 +1,4 @@
-# Longhorn NeuroTech EMG Signal Processing Pipeline
+# Longhorn Neurotech EMG Signal Processing Pipeline
 
 This project implements a complete EMG (electromyography) signal processing pipeline using a MyoWare sensor and an ESP32 DevKit V1, combining embedded software and Python analysis. The pipeline reads raw analog EMG data, reduces noise, and visualizes the frequency components for research and analysis purposes.  
 
@@ -43,4 +43,4 @@ The pipeline consists of two main stages:
 - Educational tool for signal processing and embedded systems.
 
 ## Authors
-- Longhorn NeuroTech Team
+- Longhorn Neurotech Team
