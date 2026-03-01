@@ -1,27 +1,57 @@
-//#include "BluetoothSerial.h"
 
-//BluetoothSerial SerialBT;
+#include "BluetoothSerial.h"
 
-// EMG signal pin (use an ADC1 pin — required for stable BT operation)
-const int emgPin = 25;  // GPIO36 = ADC1_CH0
+
+BluetoothSerial SerialBT;
+
+
+// ===== EMG CONFIG =====
+const int emgPin = 34;        // ADC1 pin (safe with BT)
+const int SAMPLE_RATE = 5000; // Hz
+const int AVG_FACTOR  = 64;   // Over-averaging factor
+
+
+// ===== TIMER CONFIG =====
+hw_timer_t* sampletimer = NULL;
+
+
+// ===== SHARED DATA =====
+volatile uint16_t averagedSample = 0;
+
+
+// ===== TIMER ISR =====
+void IRAM_ATTR onSampleTimer() {
+  averagedSample = analogRead(emgPin);
+  SerialBT.println(averagedSample);
+
+
+ 
+}
+
 
 void setup() {
   Serial.begin(115200);
 
-  // Start Bluetooth with device name
- // SerialBT.begin("ESP32_EMG");
-  Serial.println("Bluetooth started. Pair with device named ESP32_EMG");
+
+  // Bluetooth start
+  SerialBT.begin("ESP32_EMG");
+ // Serial.println("Bluetooth started. Pair with ESP32_EMG");
+
 
   pinMode(emgPin, INPUT);
-}
 
-void loop() {
-  // Read EMG value from MyoWare (0–4095)
-  int emgValue = analogRead(emgPin);
 
-  // Send value via Bluetooth
-  //SerialBT.println(emgValue);
-  Serial.println(emgValue);
+  // ADC settings (important for EMG)
+  //analogReadResolution(12);          // 0–4095
+  //analogSetAttenuation(ADC_11db);    // Full range ~3.3V
 
-  delay(5);  // ~200 samples/sec (adjust for smoother/faster streaming)
+
+  // ===== TIMER SETUP =====
+  sampletimer = timerBegin(80000000);
+  // 80 MHz / 80 = 1 MHz → 1 tick = 1 µs
+
+
+  timerAttachInterrupt(sampletimer, &onSampleTimer);
+  timerAlarm(sampletimer, 80000000/SAMPLE_RATE, true, 0);
+  //timerAlarmWrite(sampletimer, 80000000 / SAMPLE_RATE, true);
 }
